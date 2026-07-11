@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>위클리 마켓 리뷰 · 2026.07.11</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+  :root{
+    --paper:#f2ede2;
+    --ink:#1c1c1e;
+    --rule:#c9c0ab;
+    --red:#b6392f;
+    --blue:#274b6d;
+    --gold:#a5822a;
+    --panel:#e8e0cd;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#d8d2c1;
+    color:var(--ink);
+    font-family:'Noto Sans KR', sans-serif;
+    display:flex;
+    justify-content:center;
+    padding:32px 12px;
+  }
+  .sheet{
+    max-width:880px;
+    width:100%;
+    background:var(--paper);
+    box-shadow:0 8px 40px rgba(0,0,0,0.25);
+    padding:0 0 60px 0;
+    position:relative;
+  }
+  .sheet::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.015) 0px, rgba(0,0,0,0.015) 1px, transparent 1px, transparent 3px);
+    mix-blend-mode:multiply;
+  }
+
+  /* Masthead */
+  .masthead{
+    border-bottom:4px double var(--ink);
+    padding:28px 40px 16px;
+  }
+  .masthead .kicker{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--red);
+    display:flex;
+    justify-content:space-between;
+  }
+  .masthead h1{
+    font-family:'Noto Serif KR', serif;
+    font-weight:900;
+    font-size:56px;
+    letter-spacing:-1px;
+    margin:8px 0 4px;
+    line-height:1;
+  }
+  .masthead .sub{
+    font-family:'Noto Serif KR', serif;
+    font-size:15px;
+    color:#444;
+    border-top:1px solid var(--rule);
+    padding-top:8px;
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+
+  /* Ticker */
+  .ticker{
+    display:flex;
+    font-family:'Space Mono', monospace;
+    font-size:12.5px;
+    border-bottom:1px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    overflow-x:auto;
+  }
+  .ticker span{
+    padding:9px 18px;
+    border-right:1px solid #444;
+    white-space:nowrap;
+  }
+  .up{color:#7fc99b;}
+  .down{color:#e08a80;}
+
+  section{
+    padding:30px 40px 6px;
+  }
+  .section-label{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--red);
+    border-bottom:2px solid var(--ink);
+    padding-bottom:6px;
+    margin-bottom:18px;
+    display:flex;
+    justify-content:space-between;
+  }
+  h2.headline{
+    font-family:'Noto Serif KR', serif;
+    font-size:28px;
+    font-weight:700;
+    line-height:1.3;
+    margin:0 0 14px;
+  }
+  .lede{
+    font-family:'Noto Serif KR', serif;
+    font-size:16px;
+    line-height:1.85;
+    color:#2a2a2a;
+  }
+  .lede b{color:var(--red);}
+  .dropcap::first-letter{
+    font-family:'Noto Serif KR', serif;
+    font-size:54px;
+    font-weight:900;
+    float:left;
+    line-height:0.8;
+    padding:4px 8px 0 0;
+    color:var(--red);
+  }
+
+  .grid2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+    margin-top:20px;
+  }
+  .colrule{border-right:1px solid var(--rule);padding-right:24px;}
+
+  /* News cards */
+  .news-item{
+    border-top:1px solid var(--rule);
+    padding:14px 0;
+  }
+  .news-item:first-child{border-top:none;}
+  .news-item .tag{
+    font-family:'Space Mono', monospace;
+    font-size:10px;
+    letter-spacing:1.5px;
+    color:var(--blue);
+    text-transform:uppercase;
+  }
+  .news-item h3{
+    font-family:'Noto Serif KR', serif;
+    font-size:17px;
+    margin:4px 0 6px;
+  }
+  .news-item p{
+    font-size:13.5px;
+    line-height:1.7;
+    color:#3a3a3a;
+    margin:0;
+  }
+
+  /* Stock ledger table */
+  .ledger{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+    margin-top:10px;
+  }
+  .ledger th{
+    font-family:'Space Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    text-align:left;
+    border-bottom:2px solid var(--ink);
+    padding:8px 6px;
+    color:#555;
+  }
+  .ledger td{
+    border-bottom:1px solid var(--rule);
+    padding:10px 6px;
+    vertical-align:top;
+  }
+  .ledger .name{font-weight:700;font-family:'Noto Serif KR',serif;font-size:15px;}
+  .ledger .chg{font-family:'Space Mono', monospace;text-align:right;font-weight:700;}
+  .ledger .sector{font-family:'Space Mono', monospace;font-size:11px;color:var(--blue);}
+
+  .callout{
+    background:var(--panel);
+    border-left:4px solid var(--gold);
+    padding:16px 20px;
+    margin:20px 0;
+    font-size:14px;
+    line-height:1.75;
+  }
+  .callout .lbl{
+    font-family:'Space Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:2px;
+    color:var(--gold);
+    text-transform:uppercase;
+    display:block;
+    margin-bottom:6px;
+  }
+
+  .risk-list{
+    list-style:none;
+    padding:0;
+    margin:14px 0 0;
+  }
+  .risk-list li{
+    display:flex;
+    gap:14px;
+    padding:12px 0;
+    border-top:1px solid var(--rule);
+    font-size:13.5px;
+    line-height:1.7;
+  }
+  .risk-list li:first-child{border-top:none;}
+  .risk-list .num{
+    font-family:'Space Mono', monospace;
+    font-weight:700;
+    color:var(--red);
+    min-width:22px;
+  }
+
+  .quote-box{
+    font-family:'Noto Serif KR', serif;
+    font-size:19px;
+    line-height:1.7;
+    font-style:italic;
+    color:var(--blue);
+    padding:20px 0 20px 24px;
+    border-left:3px solid var(--blue);
+    margin:24px 0;
+}
+
+  .colophon{
+    padding:24px 40px 0;
+    margin-top:20px;
+    border-top:4px double var(--ink);
+    font-family:'Space Mono', monospace;
+    font-size:10.5px;
+    color:#666;
+    line-height:1.8;
+  }
+
+  @media(max-width:640px){
+    .masthead{padding:22px 20px 14px;}
+    .masthead h1{font-size:38px;}
+    section{padding:24px 20px 4px;}
+    .grid2{grid-template-columns:1fr;}
+    .colrule{border-right:none;padding-right:0;border-bottom:1px solid var(--rule);padding-bottom:20px;}
+    .colophon{padding:20px 20px 0;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="masthead">
+    <div class="kicker"><span>WEEKLY MARKET REVIEW</span><span>NO. 28 · 2026</span></div>
+    <h1>변동성의 한復週</h1>
+    <div class="sub">
+      <span>2026년 7월 5일 – 7월 11일</span>
+      <span>KOSPI · KOSDAQ · 반등 관찰 종목</span>
+    </div>
+  </div>
+
+  <div class="ticker">
+    <span>KOSPI 7,475.94 <span class="up">▲2.52%</span></span>
+    <span>KOSDAQ 837.43 <span class="up">▲5.47%</span></span>
+    <span>삼성전자 285,000 <span class="up">▲2.52%</span></span>
+    <span>SK하이닉스 2,180,000 <span class="down">▼0.27%</span></span>
+    <span>USD/KRW 1,529</span>
+    <span>매수 사이드카 2건 발동(7.10)</span>
+  </div>
+
+  <section>
+    <div class="section-label"><span>이번 주 시장 리뷰</span><span>OVERVIEW</span></div>
+    <h2 class="headline">널뛰기 장세, 그러나 주 후반 반등에 성공하다</h2>
+    <p class="lede dropcap">이번 주 국내 증시는 <b>롤러코스터</b> 그 자체였다. 주 초반 코스피는 한때 장중 7,300선 초반까지 밀리며 연중 최저 수준까지 후퇴했다. 삼성전자가 역대 최대 분기 실적(매출 171조 원, 영업이익 89.4조 원으로 컨센서스 상회)을 발표했음에도 "재료 소멸" 매물이 쏟아지며 9% 넘게 급락하는 이례적 장면이 연출됐고, 한화오션 컨소시엄의 캐나다 잠수함 사업 수주 실패 소식까지 겹치며 코스피는 장중 -7.68%를 기록하기도 했다. 외국인은 12거래일 넘게 연속 순매도를 이어가며 지수 하단을 계속 테스트했다.</p>
+    <p class="lede" style="margin-top:14px;">그러나 주 후반 분위기는 급반전됐다. 미국 메타·마이크론 등 빅테크의 AI 설비투자 확대 소식이 전해지며 <b>7월 10일 코스피·코스닥 양대 지수에 매수 사이드카가 동시 발동</b>됐다. 코스피는 2.52% 오른 7,475.94, 코스닥은 5.47% 급등한 837.43으로 마감하며 이틀 연속 상승했다. 기관이 코스피에서만 1조 3,534억 원을 순매수하며 반등을 주도했다.</p>
+  </section>
+
+  <section>
+    <div class="section-label"><span>이번 주 헤드라인</span><span>NEWS</span></div>
+    <div class="grid2">
+      <div class="colrule">
+        <div class="news-item">
+          <span class="tag">반도체</span>
+          <h3>삼성전자, 어닝 서프라이즈에도 "재료 소멸" 매도</h3>
+          <p>2분기 잠정 영업이익 89.4조 원으로 컨센서스(84.2조 원) 상회. 그러나 호재 선반영 인식에 주가는 오히려 급락 후 주 후반 반등.</p>
+        </div>
+        <div class="news-item">
+          <span class="tag">IPO</span>
+          <h3>SK하이닉스, 나스닥 ADR 상장 공모가 149달러 확정</h3>
+          <p>월가 주관사 수수료만 최소 1.4억 달러 규모로 추산. 미국 상장을 앞두고 투자자 관심 집중, 검색어 상위권 지속 노출.</p>
+        </div>
+        <div class="news-item">
+          <span class="tag">방산</span>
+          <h3>한화오션 컨소시엄, 캐나다 잠수함 사업 탈락</h3>
+          <p>나토 동맹 체계 장벽을 넘지 못하며 장중 22%까지 급락. 한화시스템·HD현대중공업 등 방산주 동반 약세.</p>
+        </div>
+      </div>
+      <div>
+        <div class="news-item">
+          <span class="tag">바이오</span>
+          <h3>HLB, 간암 신약 FDA 허가 불발 → 하한가</h3>
+          <p>펩트론 등 관련주 동반 급락. 바이오 섹터 내에서도 개별 종목 재료 성패에 따른 명암이 극명하게 갈림.</p>
+        </div>
+        <div class="news-item">
+          <span class="tag">수급</span>
+          <h3>외국인 12거래일 연속 순매도, 개인이 받아냄</h3>
+          <p>올해 외국인 코스피 순매도 누적 약 160조 원. 개인·ETF 자금이 매물을 흡수하며 지수 하단을 방어하는 구도가 반복.</p>
+        </div>
+        <div class="news-item">
+          <span class="tag">거시</span>
+          <h3>美 관세·중동 리스크가 변동성 증폭</h3>
+          <p>트럼프發 대한 관세 협상 발언과 중동發 지정학 리스크가 반도체·자동차·조선 등 수출 업종 헤드라인 리스크로 작용.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label"><span>바닥 다지고 올라오는 종목</span><span>TURNAROUND WATCH</span></div>
+    <h2 class="headline">저점을 확인하고 방향을 튼 이름들</h2>
+    <p class="lede" style="font-size:14.5px;">아래는 이번 주 급락 구간에서 저점을 다진 뒤, 7월 10일 반등 국면에서 <b>거래대금과 상승폭이 동반된</b> 종목군이다. 매수 추천이 아니라 수급 회복이 관측된 관찰 대상 정리다.</p>
+    <table class="ledger">
+      <tr><th>종목</th><th>섹터</th><th>7.10 등락</th><th style="text-align:right;">반등 논리</th></tr>
+      <tr>
+        <td class="name">원익IPS</td><td class="sector">반도체 소부장</td><td class="chg up">+19.16%</td>
+        <td>메타·마이크론 설비투자 확대 → 장비 발주 회복 기대</td>
+      </tr>
+      <tr>
+        <td class="name">피에스케이</td><td class="sector">반도체 장비</td><td class="chg up">+24.44%</td>
+        <td>낙폭과대 구간에서 반도체 투자심리 회복에 가장 민감하게 반응</td>
+      </tr>
+      <tr>
+        <td class="name">이오테크닉스</td><td class="sector">반도체 장비</td><td class="chg up">+10.51%</td>
+        <td>레이저 장비 수요, HBM 관련 후공정 투자 확대 수혜 기대</td>
+      </tr>
+      <tr>
+        <td class="name">유진테크</td><td class="sector">반도체 장비</td><td class="chg up">+12.72%</td>
+        <td>코스닥 소부장 전반의 순환매 유입 초입 구간</td>
+      </tr>
+      <tr>
+        <td class="name">주성엔지니어링</td><td class="sector">반도체 장비</td><td class="chg up">+7.57%</td>
+        <td>연저점 근접 후 거래량 동반 반등, 낙폭과대 인식</td>
+      </tr>
+      <tr>
+        <td class="name">에코프로비엠 / 에코프로</td><td class="sector">이차전지</td><td class="chg up">+9.06% / +8.06%</td>
+        <td>코스닥 소외 섹터 중 대형주 중심 순환매 수혜</td>
+      </tr>
+      <tr>
+        <td class="name">알테오젠</td><td class="sector">바이오</td><td class="chg up">+8.00%</td>
+        <td>HLB 급락과 대조적으로 개별 모멘텀 유지, 대형 바이오 중 상대적 강세</td>
+      </tr>
+      <tr>
+        <td class="name">두산</td><td class="sector">AI 소재(CCL)</td><td class="chg up">+14.88%</td>
+        <td>AI 가속기용 동박적층판(CCL) 테마, 코스피 개별 급등 종목</td>
+      </tr>
+    </table>
+    <div class="callout">
+      <span class="lbl">유의사항</span>
+      급락 이후 반등은 <b>낙폭과대 되돌림</b>과 <b>추세 전환</b>을 구분해서 봐야 한다. 신영증권은 "증시의 추세 전환까지는 아직 시간이 남아 있다"고 평가했으며, iM증권은 코스닥·바이오 등 소외 섹터의 본격 랠리는 "코스피가 11,000선 근처에 도달한 이후에나 고민해도 늦지 않다"고 언급했다. 유상증자 공시가 나온 종목은 하락장 동반 매수보다 별도 논리 검증이 필요하다.
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label"><span>인사이트</span><span>WHAT IT MEANS</span></div>
+    <div class="quote-box">
+      "재료 소멸로 인한 호재 속 가격 하락"과 "낙폭과대 되돌림"은 다르다 — 전자는 다음 모멘텀 없이는 되돌아오지 않고, 후자는 공포가 가라앉으면 빠르게 회복된다.
+    </div>
+    <ul class="risk-list">
+      <li><span class="num">01</span><span><b>단기 관전 포인트</b> — 코스피 8,000선 안착 여부. 이탈 시 현금 비중 유지, 회복 시 반도체·소부장 중심 순환매 지속 여부 확인.</span></li>
+      <li><span class="num">02</span><span><b>중기 관전 포인트</b> — 7월 빅테크 실적 발표 시즌 종료까지 변동성 지속 예상. 오픈AI 상장 일정 가시화 시 HBM 관련주 비중 확대 검토 대상.</span></li>
+      <li><span class="num">03</span><span><b>섹터 로테이션</b> — 코스닥·바이오는 아직 "본격 랠리"보다 "낙폭과대 되돌림" 국면. 개별 재료(임상·허가 결과) 확인이 필수.</span></li>
+      <li><span class="num">04</span><span><b>수급 구도</b> — 외국인 매도, 개인·기관 매수라는 구도가 반복 중. 외국인 순매수 전환 시점이 추세 전환의 핵심 신호가 될 전망.</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="section-label"><span>리스크 체크리스트</span><span>WATCHLIST</span></div>
+    <ul class="risk-list">
+      <li><span class="num">A</span><span>美 대한 관세·무역 협상 발언 재점화 가능성 (반도체·자동차·조선 헤드라인 민감)</span></li>
+      <li><span class="num">B</span><span>중동 지정학 리스크發 유가·환율 변동성</span></li>
+      <li><span class="num">C</span><span>빅테크 AI 설비투자 코멘트 — 긍정적이면 반도체 반등 트리거, 축소 신호 시 추가 하락 압력</span></li>
+      <li><span class="num">D</span><span>개별 종목 유상증자·임상 결과 등 회사 고유 리스크 (HLB 사례 참고)</span></li>
+    </ul>
+  </section>
+
+  <div class="colophon">
+    자료: 국내 언론 보도 종합(뉴데일리·이투데이·서울경제·뉴스핌·전자신문·MBC·파이낸셜뉴스 등, 2026.07.10~11 기준) · 본 매거진은 투자 참고용 정보 정리이며 투자 권유가 아닙니다 · 최종 투자 판단과 책임은 본인에게 있습니다.
+  </div>
+
+</div>
+</body>
+</html>

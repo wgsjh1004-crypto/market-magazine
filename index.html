@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>위클리 마켓 리뷰 · 전체 호</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="sheet">
+
+  <div class="masthead">
+    <div class="kicker"><span>WEEKLY MARKET REVIEW</span><span>ARCHIVE</span></div>
+    <h1>위클리 마켓 리뷰</h1>
+    <div class="sub">
+      <span>국내 증시 주간 리뷰 · 뉴스 · 바닥권 반등 종목 정리</span>
+      <span id="issue-count"></span>
+    </div>
+  </div>
+
+  <section>
+    <div class="section-label"><span>전체 호</span><span>ALL ISSUES</span></div>
+    <ul class="archive-list" id="archive-list">
+      <li class="lede" style="padding:20px 0;">불러오는 중…</li>
+    </ul>
+  </section>
+
+  <div class="colophon">
+    매주 자동 발행 · 삼성전자, SK하이닉스, 코스피, 코스닥 등 국내 증시 동향을 정리합니다 · 투자 참고용이며 투자 권유가 아닙니다.
+  </div>
+
+</div>
+
+<script>
+fetch('issues/manifest.json')
+  .then(r => r.json())
+  .then(issues => {
+    issues.sort((a, b) => b.issue_no - a.issue_no);
+    const list = document.getElementById('archive-list');
+    document.getElementById('issue-count').textContent = `총 ${issues.length}개 호 발행`;
+    list.innerHTML = issues.map(iss => `
+      <a class="archive-item" href="issues/${iss.file}">
+        <span class="arch-no">No. ${String(iss.issue_no).padStart(2,'0')}</span>
+        <span class="arch-title">${iss.title}</span>
+        <span class="arch-date">${iss.date_range}</span>
+      </a>
+    `).join('');
+  })
+  .catch(() => {
+    document.getElementById('archive-list').innerHTML =
+      '<li class="lede" style="padding:20px 0;">아직 발행된 호가 없습니다.</li>';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+name: Weekly Market Magazine
+
+on:
+  schedule:
+    # 매주 토요일 07:00 KST (금요일 22:00 UTC)
+    - cron: "0 22 * * 5"
+  workflow_dispatch: {}   # Actions 탭에서 수동 실행도 가능
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Generate this week's issue
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python scripts/generate_issue.py
+
+      - name: Commit and push new issue
+        run: |
+          git config user.name "market-magazine-bot"
+          git config user.email "actions@github.com"
+          git add issues/
+          git diff --cached --quiet && echo "No changes" || git commit -m "새 호 자동 발행 $(date +%F)"
+          git push
