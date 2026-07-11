@@ -143,7 +143,7 @@ def render_list(items, style="num"):
     return "\n".join(out)
 
 
-def build_html(issue_no: int, filename: str, d: dict) -> str:
+def build_html(issue_no: int, filename: str, d: dict, assets_href: str, archive_href: str) -> str:
     left_news, right_news = render_news(d["news"])
     ticker_html = "\n".join(f'    <span>{it["text"]}</span>' for it in d["ticker"])
     return f'''<!DOCTYPE html>
@@ -151,7 +151,7 @@ def build_html(issue_no: int, filename: str, d: dict) -> str:
 <head>
 <meta charset="UTF-8">
 <title>위클리 마켓 리뷰 · {d["date_range"]}</title>
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="{assets_href}">
 </head>
 <body>
 <div class="sheet">
@@ -161,7 +161,7 @@ def build_html(issue_no: int, filename: str, d: dict) -> str:
     <h1>{d["title"]}</h1>
     <div class="sub">
       <span>{d["date_range"]}</span>
-      <span><a href="../index.html">← 전체 호 보기</a></span>
+      <span><a href="{archive_href}">지난 호 모아보기 →</a></span>
     </div>
   </div>
 
@@ -240,8 +240,13 @@ def main():
     print(f"Generating issue No.{next_no} for {week_label} ...", file=sys.stderr)
     data = call_claude(week_label)
 
-    html = build_html(next_no, filename, data)
-    (ISSUES_DIR / filename).write_text(html, encoding="utf-8")
+    # 1) archived copy under issues/, linked from archive.html one level up
+    issue_html = build_html(next_no, filename, data, assets_href="../assets/style.css", archive_href="../archive.html")
+    (ISSUES_DIR / filename).write_text(issue_html, encoding="utf-8")
+
+    # 2) root index.html always mirrors the latest issue, so it's what visitors see first
+    index_html = build_html(next_no, filename, data, assets_href="assets/style.css", archive_href="archive.html")
+    (ROOT / "index.html").write_text(index_html, encoding="utf-8")
 
     manifest.append(
         {
