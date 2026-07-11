@@ -18,7 +18,14 @@
   </div>
 
   <section>
-    <div class="section-label"><span>전체 호</span><span>ALL ISSUES</span></div>
+    <div class="section-label"><span>최신호</span><span>LATEST</span></div>
+    <div class="featured" id="featured">
+      <span class="badge">불러오는 중…</span>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label"><span>지난 호</span><span>ARCHIVE</span></div>
     <ul class="archive-list" id="archive-list">
       <li class="lede" style="padding:20px 0;">불러오는 중…</li>
     </ul>
@@ -35,19 +42,43 @@ fetch('issues/manifest.json')
   .then(r => r.json())
   .then(issues => {
     issues.sort((a, b) => b.issue_no - a.issue_no);
-    const list = document.getElementById('archive-list');
     document.getElementById('issue-count').textContent = `총 ${issues.length}개 호 발행`;
-    list.innerHTML = issues.map(iss => `
-      <a class="archive-item" href="issues/${iss.file}">
-        <span class="arch-no">No. ${String(iss.issue_no).padStart(2,'0')}</span>
-        <span class="arch-title">${iss.title}</span>
-        <span class="arch-date">${iss.date_range}</span>
-      </a>
-    `).join('');
+
+    const featuredEl = document.getElementById('featured');
+    const archiveEl = document.getElementById('archive-list');
+
+    if (issues.length === 0) {
+      featuredEl.innerHTML = '<span class="badge">발행된 호 없음</span><h3>아직 발행된 호가 없습니다</h3>';
+      archiveEl.innerHTML = '<li class="lede" style="padding:20px 0;">첫 호가 발행되면 여기에 쌓입니다.</li>';
+      return;
+    }
+
+    const [latest, ...rest] = issues;
+
+    featuredEl.innerHTML = `
+      <span class="badge">No. ${String(latest.issue_no).padStart(2,'0')} · ${latest.date_range}</span>
+      <h3>${latest.title}</h3>
+      <div class="meta">가장 최근에 발행된 호입니다</div>
+      <a class="cta" href="issues/${latest.file}">최신호 읽기 →</a>
+    `;
+
+    if (rest.length === 0) {
+      archiveEl.innerHTML = '<li class="lede" style="padding:20px 0;">아직 지난 호가 없습니다. 다음 주부터 쌓여요.</li>';
+    } else {
+      archiveEl.innerHTML = rest.map(iss => `
+        <a class="archive-item" href="issues/${iss.file}">
+          <span class="arch-no">No. ${String(iss.issue_no).padStart(2,'0')}</span>
+          <span class="arch-title">${iss.title}</span>
+          <span class="arch-date">${iss.date_range}</span>
+        </a>
+      `).join('');
+    }
   })
   .catch(() => {
+    document.getElementById('featured').innerHTML =
+      '<span class="badge">오류</span><h3>목록을 불러오지 못했습니다</h3>';
     document.getElementById('archive-list').innerHTML =
-      '<li class="lede" style="padding:20px 0;">아직 발행된 호가 없습니다.</li>';
+      '<li class="lede" style="padding:20px 0;">manifest.json을 확인해주세요.</li>';
   });
 </script>
 </body>
