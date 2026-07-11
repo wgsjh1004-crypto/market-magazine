@@ -27,6 +27,25 @@ MANIFEST_PATH = ISSUES_DIR / "manifest.json"
 MODEL = "claude-sonnet-5"
 API_URL = "https://api.anthropic.com/v1/messages"
 
+# 구글 서치 콘솔 / 네이버 서치 어드바이저에서 받은 소유권 확인용 메타 태그를
+# 여기에 붙여넣으세요. index.html이 매주 자동으로 다시 만들어지기 때문에,
+# 태그를 파일에 직접 넣으면 다음 발행 때 사라집니다. 여기에 넣어두면
+# 매주 새로 생성되는 index.html에도 항상 포함됩니다.
+SITE_VERIFICATION_TAGS = """
+<!-- <meta name="google-site-verification" content="여기에_구글이_준_코드" /> -->
+<!-- <meta name="naver-site-verification" content="여기에_네이버가_준_코드" /> -->
+"""
+
+# 방문자수 추적 스크립트. GoatCounter(무료, https://www.goatcounter.com)에
+# 가입해서 만든 code를 아래에 넣으세요. 예: YOUR-CODE.goatcounter.com
+# 비워두면 그냥 아무것도 추가되지 않습니다.
+ANALYTICS_SNIPPET = """
+<!-- <script data-goatcounter="https://YOUR-CODE.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script> -->
+"""
+
+SITE_URL = "https://wgsjh1004-crypto.github.io/market-magazine"
+
 SCHEMA_INSTRUCTIONS = """
 당신은 한국 주식시장을 다루는 위클리 매거진의 애널리스트입니다.
 web_search 도구를 사용해 지난 7일간의 코스피/코스닥 동향, 주요 뉴스,
@@ -152,7 +171,8 @@ def build_html(issue_no: int, filename: str, d: dict, assets_href: str, archive_
 <meta charset="UTF-8">
 <title>위클리 마켓 리뷰 · {d["date_range"]}</title>
 <link rel="stylesheet" href="{assets_href}">
-</head>
+{SITE_VERIFICATION_TAGS}
+{ANALYTICS_SNIPPET}</head>
 <body>
 <div class="sheet">
 
@@ -227,6 +247,44 @@ def build_html(issue_no: int, filename: str, d: dict, assets_href: str, archive_
 '''
 
 
+def write_sitemap(manifest: list):
+    urls = [f"{SITE_URL}/", f"{SITE_URL}/archive.html"]
+    urls += [f"{SITE_URL}/issues/{m['file']}" for m in manifest]
+    body = "\n".join(
+        f"  <url><loc>{u}</loc></url>" for u in urls
+    )
+    xml = f'''<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{body}
+</urlset>
+'''
+    (ROOT / "sitemap.xml").write_text(xml, encoding="utf-8")
+
+
+def write_rss(manifest: list):
+    items_sorted = sorted(manifest, key=lambda m: m["issue_no"], reverse=True)[:20]
+    items = "\n".join(
+        f'''  <item>
+    <title>{m["title"]} ({m["date_range"]})</title>
+    <link>{SITE_URL}/issues/{m["file"]}</link>
+    <guid>{SITE_URL}/issues/{m["file"]}</guid>
+    <pubDate>{m["published"]}</pubDate>
+  </item>'''
+        for m in items_sorted
+    )
+    xml = f'''<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+  <title>위클리 마켓 리뷰</title>
+  <link>{SITE_URL}/</link>
+  <description>국내 증시 주간 리뷰 · 뉴스 · 바닥권 반등 종목 정리</description>
+{items}
+</channel>
+</rss>
+'''
+    (ROOT / "rss.xml").write_text(xml, encoding="utf-8")
+
+
 def main():
     ISSUES_DIR.mkdir(exist_ok=True)
     manifest = json.loads(MANIFEST_PATH.read_text()) if MANIFEST_PATH.exists() else []
@@ -258,7 +316,9 @@ def main():
         }
     )
     MANIFEST_PATH.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"Wrote issues/{filename} and updated manifest.json", file=sys.stderr)
+    write_sitemap(manifest)
+    write_rss(manifest)
+    print(f"Wrote issues/{filename}, updated manifest.json, sitemap.xml, rss.xml", file=sys.stderr)
 
 
 if __name__ == "__main__":
